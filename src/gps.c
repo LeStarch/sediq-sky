@@ -118,7 +118,7 @@ int decodeGPSBuffer(char* tag, unsigned char* buffer, TaggedPacket* packet)
 	//Check checksum
 	while (i < GPS_BUFFER_SIZE && buffer[i] != '*')
 	{
-		checksum += buffer[i];
+		checksum ^= buffer[i];
 		i++;
 	}
 	if (i == GPS_BUFFER_SIZE)
@@ -126,15 +126,14 @@ int decodeGPSBuffer(char* tag, unsigned char* buffer, TaggedPacket* packet)
 		fillErrorPacket(ER_GPS_MALFORMED_DATA,ER_GPS_MALFORMED_DATA_MSG,packet);
 		return ER_GPS_MALFORMED_DATA;
 	}
-	checksum += '$'+'G'+'P'+'G'+'G'+'A';
-	checksum -= (buffer[i+1] - (buffer[i+1] >= 65 ? 55 : 48)) << 4 + buffer[i+2] - (buffer[i+2] >= 65 ? 55 : 48);
+	checksum = checksum ^ 'G'^'P'^'G'^'G'^'A';
+	checksum -= (buffer[i+1] - (buffer[i+1] >= 65 ? 55 : 48)) << 4;
+	checksum -= buffer[i+2] - (buffer[i+2] >= 65 ? 55 : 48);
 	if (checksum != 0)
 	{
 		fillErrorPacket(ER_GPS_NOT_CHECKSUM,ER_GPS_NOT_CHECKSUM_MSG,packet);
 		return ER_GPS_NOT_CHECKSUM;
 	}
-	fillErrorPacket(ER_GPS_MALFORMED_DATA,ER_GPS_MALFORMED_DATA_MSG,packet);
-	return ER_GPS_MALFORMED_DATA;
 	//Buffer should start with comma, then 10 digits of time
 	buffer++;
 	if (*buffer == ',')

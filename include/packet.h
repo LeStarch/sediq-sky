@@ -28,7 +28,7 @@
 		float latitude;
 		float longitude;
 		float altitude;
-		unsigned char time[10];
+		unsigned char time[9];
 		unsigned char satellites;
 	} GPSPacket;
 	/**

@@ -63,10 +63,11 @@
 					fprintf(stdout,"Error detected(%x): %s\n",packet.packet.error.code,packet.packet.error.message);
 					break;
 				case GPSPacketType:
-					fprintf(stdout,"GPS Location found: (%f,%f,%f) @%10s with %d satellites\n",
+					fprintf(stdout,"GPS Location found: (%f,%f,%f) @%.*s with %d satellites\n",
 								packet.packet.gps.latitude,
 								packet.packet.gps.longitude,
 								packet.packet.gps.altitude,
+								sizeof(packet.packet.gps.time),
 								packet.packet.gps.time,
 								packet.packet.gps.satellites
 							);
