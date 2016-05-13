@@ -6,7 +6,7 @@
  *  Created on: Mar 18, 2016
  *      Author: starchmd
  */
-#include "testing.h"
+#include "gps-test.h"
 #ifdef SEDIQ_TESTING
 	#include <stdio.h>
 
@@ -67,7 +67,7 @@
 								packet.packet.gps.latitude,
 								packet.packet.gps.longitude,
 								packet.packet.gps.altitude,
-								sizeof(packet.packet.gps.time),
+								(int)sizeof(packet.packet.gps.time),
 								packet.packet.gps.time,
 								packet.packet.gps.satellites
 							);

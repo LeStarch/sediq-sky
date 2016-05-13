@@ -12,7 +12,7 @@
 #include "gps.h"
 #include "serror.h"
 
-#include <testing.h>
+#include <gps-test.h>
 
 /**
  * Reads a packet from the GPS UART unit

@@ -1,6 +1,6 @@
-testing:
+bin/gps-test:
 	mkdir -p bin
-	gcc -g -I./include src/gps.c src/testing.c src/serror.c -o bin/testing
+	gcc -g -I./include -I./test/include src/* test/src/gps-test.c -o bin/gps-test
 clean:
 	rm -rf bin/*
 	rmdir bin
