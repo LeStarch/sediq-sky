@@ -8,6 +8,7 @@
 #include <SPI.h>
 
 #include "radio.h"
+#include "sky-gps.h"
 
 
 
@@ -31,4 +32,5 @@ void setup() {
     radio.spi(0x3a, buffer, 1, 0);
     Serial.print(buffer[0]);
     Serial.println(">");
+    SkySensor::SkyGPS sky();
 }
