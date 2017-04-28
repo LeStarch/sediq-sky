@@ -1,0 +1,9 @@
+.pioenvs
+.piolibdeps
+lib/readme.txt
+
+# Eclipse files
+.project
+.cproject
+.settings
+.travis.yml
