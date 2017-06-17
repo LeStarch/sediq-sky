@@ -11,6 +11,5 @@ using namespace SkySensor;
 int SkySensor::SkySensor::detect(size_t& size) {
     return this->detect(SkySensor::DEFAULT_TIMEOUT, size);
 }
-
-
-
+//Destructor is required even when pure virtual
+SkySensor::SkySensor::~SkySensor() {}

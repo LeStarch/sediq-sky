@@ -41,7 +41,7 @@
                  * \param size: [out] number of packets available
                  * \return: 0 on success or something else on error
                  */
-                virtual int detect(uint32_t timeout, size_t& size);
+                virtual int detect(uint32_t timeout, size_t& size) = 0;
                 /**
                  * Get a packet from this sensor written into the buffer
                  * provided. If the packet is larger than the size provided the
@@ -51,12 +51,12 @@
                  * \param size: [in/out] maximum packet size/size actually written
                  * \return: 0 on success or something else on error
                  */
-                virtual size_t getPacket(uint8_t* buffer, size_t size);
+                virtual size_t getPacket(uint8_t* buffer, size_t size) = 0;
                 /**
                  * C++ style note: virtual classes must define a virtual destructor
                  * to ensure base-references properly destroy child classes
                  */
-                virtual ~SkySensor();
+                virtual ~SkySensor() = 0;
         };
     }; //End namespace
 #endif /* LIB_SKY_SENSOR_SKY_SENSOR_H_ */

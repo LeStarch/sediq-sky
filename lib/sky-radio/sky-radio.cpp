@@ -4,9 +4,10 @@
  *  Created on: Oct 15, 2016
  *      Author: starchmd
  */
+#include "sky-radio.h"
+
 #include <SPI.h>
 #include "Arduino.h"
-#include "radio.h"
 
 Radio::Radio()
 {

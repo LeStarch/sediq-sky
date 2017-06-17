@@ -4,7 +4,6 @@
  *  Created on: Oct 15, 2016
  *      Author: starchmd
  */
-
 #ifndef RADIO_H_
 #define RADIO_H_
     #define RADIO_SPI_FREQ 5000000

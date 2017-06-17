@@ -7,30 +7,39 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "radio.h"
+#include "../lib/sky-radio/sky-radio.h"
 #include "sky-gps.h"
 
-
+SkySensor::SkyGPS sky(&Serial2);
 
 void loop()
 {
-
+    unsigned char buffer[1024];
+    SkySensor::SkyGPS::GPSPacket packet;
+    size_t available;
+    sky.detect(100, available);
+    if (available > 0) {
+        sky.getPacket(buffer, sizeof(packet));
+        packet.deserialize(buffer);
+        Serial.print("Latitude:");
+        Serial.println(packet.latitude);
+        Serial.print("Longitude:");
+        Serial.println(packet.longitude);
+        Serial.print("Altitude:");
+        Serial.println(packet.altitude);
+        Serial.print("Satellite count:");
+        Serial.println(packet.satellites);
+        Serial.print("Time:");
+        for (int i = 0; i < 9; i++) {
+            Serial.print(packet.time[i]);
+        }
+        Serial.println();
+    }
 }
 
 void setup() {
-    uint8_t buffer[1024];
-    buffer[0] = 0xB;
     Serial.begin(9600);
-    Serial.println("Starting radio test program");
-    Radio radio;
-    delay(1000);
-    Serial.println("Powering on radio");
-    radio.powerOn();
-    delay(1000);
-    Serial.print("Reading radio version: <");
-    //radio.spi(0x3a, buffer, 1, 1);
-    radio.spi(0x3a, buffer, 1, 0);
-    Serial.print(buffer[0]);
-    Serial.println(">");
-    SkySensor::SkyGPS sky();
+    Serial2.begin(9600);
+    delay(500);
+
 }
