@@ -4,10 +4,12 @@
  *  Created on: Oct 15, 2016
  *      Author: starchmd
  */
-#include "sky-radio.h"
-
+#include "logger.h"
+#include <radio.h>
 #include <SPI.h>
 #include "Arduino.h"
+
+using namespace Sediq;
 
 Radio::Radio()
 {
@@ -18,25 +20,38 @@ Radio::Radio()
     SPI.begin();
 
 }
-
-int Radio::powerOn()
+int Radio::send(uint8_t* data, size_t& size)
 {
-    digitalWrite(RADIO_POWER_PIN, HIGH);
+    Logger::getLogger(Logger::DEBUG)->log(Logger::INFO, (char*)data);
+    return 0;
+}
+int Radio::recv(uint8_t* data, size_t& size)
+{
+    return 0;
+}
+int Radio::resume()
+{
+    uint8_t mode = SKY_RADIO_STANDBY << SKY_RADIO_SHIFT;
+    this->writeReg(SKY_RADIO_MODE_REG, mode);
     return 0;
 }
 
-int Radio::powerOff()
+int Radio::sleep()
 {
+    //Switch this to sleep the radio
     digitalWrite(RADIO_POWER_PIN, LOW);
     return 0;
 }
-
-Radio::Status status()
+bool Radio::ready()
 {
-    return Radio::OFF;
+    return 0;
 }
-
-
+int Radio::writeReg(uint8_t reg, uint8_t& inout) {
+    return spi(reg, &inout, 1, 1);
+}
+int Radio::readReg(uint8_t reg, uint8_t& inout) {
+    return spi(reg, &inout, 1, 0);
+}
 int Radio::spi(uint8_t reg, uint8_t* data, size_t size, bool write)
 {
     //Setup the SPI transaction

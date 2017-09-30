@@ -12,7 +12,7 @@
     /**
      * Namespace for SkySensor implementors and related software
      */
-    namespace SkySensor {
+    namespace Sediq {
         /**
          * A virtual class used to represent a sensor for the sediq-sky package.
          * This enables the system to handle packets in a generic way, and allow
@@ -20,7 +20,7 @@
          *
          * @author starchmd
          */
-        class SkySensor {
+        class Sensor {
             public:
                 //Default timeout is 50ms
                 const uint32_t DEFAULT_TIMEOUT = 50;
@@ -53,10 +53,15 @@
                  */
                 virtual size_t getPacket(uint8_t* buffer, size_t size) = 0;
                 /**
+                 * Get the maximum size of packets
+                 * @return - maximum size of packerts
+                 */
+                virtual size_t getMaxSize() = 0;
+                /**
                  * C++ style note: virtual classes must define a virtual destructor
                  * to ensure base-references properly destroy child classes
                  */
-                virtual ~SkySensor() = 0;
+                virtual ~Sensor() = 0;
         };
     }; //End namespace
 #endif /* LIB_SKY_SENSOR_SKY_SENSOR_H_ */

@@ -4,13 +4,14 @@
  *  Created on: Apr 28, 2017
  *      Author: starchmd
  */
+#include "gps.h"
+
 #include <string.h>
 #include <stdio.h>
-#include "sky-gps.h"
 
-using namespace SkySensor;
+using namespace Sediq;
 
-int SkyGPS::GPSPacket::serialize(unsigned char* buffer, size_t size) {
+int GPS::GPSPacket::serialize(unsigned char* buffer, size_t size) {
     Serial.println(this->altitude);
     *(((float*)buffer) + 0) = this->altitude;
     Serial.println(this->latitude);
@@ -20,24 +21,24 @@ int SkyGPS::GPSPacket::serialize(unsigned char* buffer, size_t size) {
     return 0;
 }
 
-int SkyGPS::GPSPacket::deserialize(unsigned char* buffer) {
+int GPS::GPSPacket::deserialize(unsigned char* buffer) {
     this->altitude = *(((float*)buffer) + 0);
     this->latitude = *(((float*)buffer) + 1);
     this->longitude= *(((float*)buffer) + 2);
     return 0;
 }
 
-SkyGPS::SkyGPS(HardwareSerial* serial) {
+GPS::GPS(HardwareSerial* serial) {
     this->serial = serial;
 }
-SkyGPS::~SkyGPS() {}
+GPS::~GPS() {}
 
-int SkyGPS::detect(uint32_t timeout, size_t& size) {
+int GPS::detect(uint32_t timeout, size_t& size) {
     this->gpsMachine(timeout);
     size = this->packetCount;
     return 0;
 }
-size_t SkyGPS::getPacket(uint8_t* buffer, size_t size) {
+size_t GPS::getPacket(uint8_t* buffer, size_t size) {
     if (size < sizeof(GPSPacket)) {
         return 1;
     }
@@ -46,9 +47,11 @@ size_t SkyGPS::getPacket(uint8_t* buffer, size_t size) {
     this->packets[this->packetCount].serialize(buffer, size);
     return 0;
 }
-
-
-int SkyGPS::gpsMachine(uint32_t timeout)
+size_t GPS::getMaxSize()
+{
+    return sizeof(GPS::GPSPacket);
+}
+int GPS::gpsMachine(uint32_t timeout)
 {
     int ret = 0;
     unsigned char current = 0;
@@ -115,7 +118,7 @@ int SkyGPS::gpsMachine(uint32_t timeout)
     }
     return 0;
 }
-void SkyGPS::handleGPSError(int status) {
+void GPS::handleGPSError(int status) {
     if (status == 5)
         return;
     //TODO: handle an error here with logging etc
@@ -129,7 +132,7 @@ void SkyGPS::handleGPSError(int status) {
  * unsigned char* buffer - buffer holding GPS data
  * return 0 on success, negative on error, 1 on no packet
  */
-int SkyGPS::decodeGPSBuffer(unsigned char* buffer)
+int GPS::decodeGPSBuffer(unsigned char* buffer)
 {
     int i = 0;
     unsigned char checksum = 0;
@@ -171,12 +174,12 @@ int SkyGPS::decodeGPSBuffer(unsigned char* buffer)
     buffer += GPS_TIME_SIZE;
     buffer++;
     //Read lat and long
-    buffer = (unsigned char*)SkyGPS::decodeDegHHMM((char*)buffer,this->packets[this->packetCount].latitude);
+    buffer = (unsigned char*)GPS::decodeDegHHMM((char*)buffer,this->packets[this->packetCount].latitude);
     if (buffer == NULL)
     {
         return ER_GPS_BAD_DATA_ERROR;
     }
-    buffer = (unsigned char*)SkyGPS::decodeDegHHMM((char*)buffer,this->packets[this->packetCount].longitude);
+    buffer = (unsigned char*)GPS::decodeDegHHMM((char*)buffer,this->packets[this->packetCount].longitude);
     if (buffer == NULL)
     {
         return ER_GPS_BAD_DATA_ERROR;
@@ -200,7 +203,7 @@ int SkyGPS::decodeGPSBuffer(unsigned char* buffer)
  * float value - (output) value to fill with decoded value
  * return - NULL on error, or address after the DegHHMM portion
  */
-char* SkyGPS::decodeDegHHMM(char* buffer, float& value)
+char* GPS::decodeDegHHMM(char* buffer, float& value)
 {
     int i = 0,tmp = 0;
     //Safely find '.' or error

@@ -4,7 +4,7 @@
  *  Created on: Apr 28, 2017
  *      Author: starchmd
  */
-#include <sky-sensor.h>
+#include <sensor.h>
 #include <Arduino.h>
 #ifndef LIB_SKY_GPS_SKY_GPS_H_
 #define LIB_SKY_GPS_SKY_GPS_H_
@@ -24,9 +24,9 @@
     #define ER_GPS_BAD_STATE 3
     #define ER_GPS_UNIMPLEMENTED_PACKET 5
 
-    namespace SkySensor {
+    namespace Sediq {
 
-        class SkyGPS : SkySensor {
+        class GPS : public Sensor {
             public:
                 /**
                  * In C++ structs are classes with all public members, here
@@ -78,7 +78,7 @@
                 /**
                  * Build the GPS around a serial port
                  */
-                SkyGPS(HardwareSerial* serial);
+                GPS(HardwareSerial* serial);
                 /**
                  * Run the GPS sensor and capture packets returning the number
                  * of packets available for a call to getPacket.
@@ -97,10 +97,15 @@
                  * \return: 0 on success or something else on error
                  */
                 size_t getPacket(uint8_t* buffer, size_t size);
+                /**
+                 * Get the maximum size of this packet
+                 * @return: size of GPS packet
+                 */
+                size_t getMaxSize();
                  /**
                   * Destruct
                   */
-                ~SkyGPS();
+                ~GPS();
         };
     }; //End sky sensor namespace
 #endif /* LIB_SKY_GPS_SKY_GPS_H_ */
