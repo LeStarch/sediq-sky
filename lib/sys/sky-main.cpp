@@ -5,6 +5,7 @@
  *      Author: starchmd
  */
 
+#include <Arduino.h>
 #include "sky-main.h"
 #include "logger.h"
 
@@ -27,7 +28,7 @@ void SkyMain::main(Comm& comm, Executor* executors, size_t count)
     size_t i = 0;
     while(1)
     {
-        LOGGER->log(Logger::INFO, "Executing %d executors", count);
+        //LOGGER->log(Logger::INFO, "Executing %d executors", count);
         for (i = 0; i < count; i++)
         {
             status = this->execute(comm, executors[i]);
@@ -35,6 +36,7 @@ void SkyMain::main(Comm& comm, Executor* executors, size_t count)
                 LOGGER->log(Logger::WARNING, "Communications failure: %d", status);
             }
         }
+        //delay(100);
     }
 }
 
@@ -46,6 +48,8 @@ int SkyMain::execute(Comm& comm, Executor& executor)
         size = this->bufferSize;
         executor.error(status, this->buffer, size);
     }
-    status = comm.send(this->buffer, size);
+    if (size > 0) {
+        status = comm.send(this->buffer, size);
+    }
     return status;
 }

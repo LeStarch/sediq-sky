@@ -10,24 +10,25 @@
 //#include "../lib/sky-radio/sky-radio.h"
 #include "logger.h"
 #include "gps.h"
-#include "radio.h"
+#include "gps-test-comm.h"
 #include "sky-main.h"
 #include "sensor-executor.h"
 
-
 Sediq::GPS sky(&Serial2);
 Sediq::SensorExecutor executor("GPS Executor", sky);
-Sediq::Radio radio;
+Sediq::Test::GPSTestComm comm;
+
 void loop()
 {
 
 }
 
 void setup() {
-    Sediq::Logger log(Sediq::Logger::DEBUG);
+    Sediq::Logger* log = Sediq::Logger::getLogger(Sediq::Logger::DEBUG);
     //Serial.begin(9600);
     Serial2.begin(9600);
     delay(500);
+    log->log(Sediq::Logger::INFO, "Beginning main program");
     Sediq::SkyMain main;
-    main.main(radio, &executor, 1);
+    main.main(comm, &executor, 1);
 }

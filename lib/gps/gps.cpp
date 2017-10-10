@@ -5,47 +5,66 @@
  *      Author: starchmd
  */
 #include "gps.h"
+#include "logger.h"
 
 #include <string.h>
 #include <stdio.h>
 
 using namespace Sediq;
 
-int GPS::GPSPacket::serialize(unsigned char* buffer, size_t size) {
-    Serial.println(this->altitude);
-    *(((float*)buffer) + 0) = this->altitude;
-    Serial.println(this->latitude);
-    *(((float*)buffer) + 1) = this->latitude;
-    Serial.println(this->longitude);
-    *(((float*)buffer) + 2) = this->longitude;
+int GPS::GPSPacket::serialize(unsigned char* buffer, size_t& size) {
+    unsigned char* write = buffer;
+
+
+    *((unsigned long int*) write) = this->deviceTime;
+    write += sizeof(unsigned long int);
+    *((float *) write) = this->altitude;
+    write += sizeof(float);
+    *((float *) write) = this->latitude;
+    write += sizeof(float);
+    *((float *) write) = this->longitude;
+    write += sizeof(float);
+    *write = this->satellites;
+    write += 1;
+    memcpy(write, this->time, sizeof(this->time));
+    size = sizeof(float) * 3 + sizeof(unsigned long) + 1 + sizeof(this->time);
     return 0;
 }
 
 int GPS::GPSPacket::deserialize(unsigned char* buffer) {
-    this->altitude = *(((float*)buffer) + 0);
-    this->latitude = *(((float*)buffer) + 1);
-    this->longitude= *(((float*)buffer) + 2);
+    unsigned char* read = buffer;
+    this->deviceTime = *((unsigned long int*) read);
+    read += sizeof(unsigned long int);
+    this->altitude = *((float *) read);
+    read += sizeof(float);
+    this->latitude = *((float *) read);
+    read += sizeof(float);
+    this->longitude = *((float *) read);
+    read += sizeof(float);
+    this->satellites = *read;
+    read += 1;
+    memcpy(this->time, read, sizeof(this->time));
     return 0;
 }
 
 GPS::GPS(HardwareSerial* serial) {
+    LOGGER = Logger::getLogger(Logger::DEBUG);
     this->serial = serial;
 }
 GPS::~GPS() {}
 
 int GPS::detect(uint32_t timeout, size_t& size) {
+    //LOGGER->log(Logger::DEBUG, "Detecting GPS Packets");
     this->gpsMachine(timeout);
     size = this->packetCount;
     return 0;
 }
-size_t GPS::getPacket(uint8_t* buffer, size_t size) {
+int GPS::getPacket(uint8_t* buffer, size_t& size) {
     if (size < sizeof(GPSPacket)) {
         return 1;
     }
     this->packetCount--;
-    Serial.println(this->packets[this->packetCount].latitude);
-    this->packets[this->packetCount].serialize(buffer, size);
-    return 0;
+    return this->packets[this->packetCount].serialize(buffer, size);
 }
 size_t GPS::getMaxSize()
 {
@@ -121,9 +140,7 @@ int GPS::gpsMachine(uint32_t timeout)
 void GPS::handleGPSError(int status) {
     if (status == 5)
         return;
-    //TODO: handle an error here with logging etc
-    Serial.print("\nError: ");
-    Serial.println(status);
+    LOGGER->log(Logger::WARNING, "GPS machine errored with status: %d", status);
 }
 /**
  * Decodes the GPS buffer and fills the tagged packet for return
@@ -141,11 +158,6 @@ int GPS::decodeGPSBuffer(unsigned char* buffer)
     {
         return ER_GPS_UNIMPLEMENTED_PACKET;
     }
-    Serial.print(this->tag);
-    for (int j = 0; j < 50; j++) {
-        Serial.print((char) buffer[j]);
-    }
-    Serial.println();
     //Check checksum
     while (i < GPS_BUFFER_SIZE && buffer[i] != '*')
     {
@@ -162,6 +174,7 @@ int GPS::decodeGPSBuffer(unsigned char* buffer)
     checksum -= buffer[i+2] - (buffer[i+2] >= 65 ? 55 : 48);
     if (checksum != 0)
     {
+        LOGGER->log(Logger::WARNING, "Found bad checksum: %d", checksum);
         return ER_GPD_BAD_CHECKSUM;
     }
     //Buffer should start with comma, then 10 digits of time

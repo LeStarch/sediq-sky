@@ -51,7 +51,7 @@
                  * \param size: [in/out] maximum packet size/size actually written
                  * \return: 0 on success or something else on error
                  */
-                virtual size_t getPacket(uint8_t* buffer, size_t size) = 0;
+                virtual int getPacket(uint8_t* buffer, size_t& size) = 0;
                 /**
                  * Get the maximum size of packets
                  * @return - maximum size of packerts

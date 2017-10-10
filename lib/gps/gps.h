@@ -4,6 +4,8 @@
  *  Created on: Apr 28, 2017
  *      Author: starchmd
  */
+#include "logger.h"
+
 #include <sensor.h>
 #include <Arduino.h>
 #ifndef LIB_SKY_GPS_SKY_GPS_H_
@@ -40,11 +42,12 @@
                     unsigned char time[GPS_TIME_SIZE];
                     unsigned char satellites;
 
-                    int serialize(unsigned char* buffer, size_t size);
+                    int serialize(unsigned char* buffer, size_t& size);
 
                     int deserialize(unsigned char* buffer);
                 };
             private:
+                Logger* LOGGER;
                 /**
                  * State machine for reading GPS data from UART
                  */
@@ -96,7 +99,7 @@
                  * \param size: [in/out] maximum packet size/size actually written
                  * \return: 0 on success or something else on error
                  */
-                size_t getPacket(uint8_t* buffer, size_t size);
+                int getPacket(uint8_t* buffer, size_t& size);
                 /**
                  * Get the maximum size of this packet
                  * @return: size of GPS packet
