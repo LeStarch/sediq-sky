@@ -12,6 +12,8 @@
     #define RADIO_SPI_FREQ 5000000
     #define RADIO_SELECT_PIN 10
     #define RADIO_POWER_PIN 3
+    #define RADIO_FIFO_NOT_EMPTY_PIN 4
+    #define RADIO_FIFO_NOT_FULL_PIN 5
 
     #define SKY_RADIO_STANDBY 0x01
     #define SKY_RADIO_TRANSMIT 0x03
@@ -50,20 +52,51 @@
                 int send(uint8_t* data, size_t& size);
                 int recv(uint8_t* data, size_t& size);
             private:
+                int mode;
+                /**
+                 * Switch the mode of the radio to be transmit or receive
+                 * 1 - transmit
+                 * 0 - receive
+                 * \param mode: mode to switch to
+                 * \return: 0 on success, or something else on error
+                 */
+                int switchMode(int mode);
+                /**
+                 * Check to see if the fifo is ready for writing operations
+                 * \return: 1 if ready, 0 if not ready
+                 */
+                static bool fifoNotFull();
+                /**
+                 * Check to see if the fifo is ready for reading operations
+                 * \return: 1 if ready, 0 if not ready
+                 */
+                static bool fifoNotEmpty();
                 /**
                  * Write the radio's SPI register
                  * \param reg: register address to write to
-                 * \param inout: dat to read and result of data
+                 * \param inout: data to read and result of data
                  * \return: status
                  */
                 int writeReg(uint8_t reg, uint8_t& inout);
                 /**
                  * Read the radio's SPI register
                  * \param reg: register address to write to
-                 * \param inout: dat to read and result of data
+                 * \param inout: data to read and result of data
                  * \return: status
                  */
                 int readReg(uint8_t reg, uint8_t& inout);
+                /**
+                 * Send or receive data from the SPI using burst-mode transmission
+                 * where the address is written one time, and then a block of data is
+                 * written or read.
+                 * \param reg: register address to read/write to
+                 * \param data: data buffer to send from AND receive from.
+                 *              Note: this data will be destroyed
+                 * \param size: [in/out] size of data to read/write
+                 * \param bool: write 1 if this is a write call, and 0 if a read
+                 *              Note: when writing, the previous value is "read"
+                 */
+                int spi(uint8_t reg, uint8_t* data, size_t& size, bool write);
                 /**
                  * Send or recieve data from the SPI using burst-mode transmission
                  * where the address is written one time, and then a block of data is
@@ -71,11 +104,13 @@
                  * \param reg: register address to read/write to
                  * \param data: data buffer to send from AND receive from.
                  *              Note: this data will be destroyed
-                 * \param size: size of data to read/write
+                 * \param size: [in/out] size of data to read/write
                  * \param bool: write 1 if this is a write call, and 0 if a read
                  *              Note: when writing, the previous value is "read"
+                 * \param cont: a function pointer to function returning boolean
+                 *              1 to continue, 0 to stop transfer
                  */
-                int spi(uint8_t reg, uint8_t* data, size_t size, bool write);
+                int spi(uint8_t reg, uint8_t* data, size_t& size, bool write, bool (* cont)());
         };
     };
 #endif /* RADIO_H_ */
