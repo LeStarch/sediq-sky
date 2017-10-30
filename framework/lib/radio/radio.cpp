@@ -6,8 +6,9 @@
  */
 #include "logger.h"
 #include <radio.h>
-#include <SPI.h>
 #include "Arduino.h"
+#include <SPI.h>
+
 
 using namespace Sediq;
 
