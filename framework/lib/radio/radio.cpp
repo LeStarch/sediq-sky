@@ -6,7 +6,7 @@
  */
 #include "logger.h"
 #include <radio.h>
-#include "Arduino.h"
+#include <Arduino.h>
 #include <SPI.h>
 
 
@@ -25,15 +25,22 @@ Radio::Radio()
     this->switchMode(mode);
 
 }
-int Radio::switchMode(int mode) {
-    return 1;
+int Radio::switchMode(uint32_t mode) {
+    size_t size = 1;
+    if (mode > 4) {
+        return -1;
+    }
+    uint8_t data = (uint8_t)(mode << 2);
+    this->spi(0x01, &data, size, true, NULL);
+    this->mode = mode;
+    return 0;
 }
 int Radio::send(uint8_t* data, size_t& size)
 {
     int status = 0;
     bool (*func)() = &Radio::fifoNotFull;
-    if (mode == 0) {
-        status = this->switchMode(1);
+    if (mode != 3) {
+        status = this->switchMode(3);
         if (status != 0) {
             return status;
         }
@@ -46,8 +53,8 @@ int Radio::recv(uint8_t* data, size_t& size)
 {
     int status = 0;
     bool (*func)() = &Radio::fifoNotEmpty;
-    if (mode == 1) {
-        status = this->switchMode(1);
+    if (mode != 4) {
+        status = this->switchMode(4);
         if (status != 0) {
             return status;
         }
@@ -103,6 +110,7 @@ int Radio::spi(uint8_t reg, uint8_t* data, size_t& size, bool write, bool (*cont
         SPI.transfer(data + i, 1);
         //Check if we need to stop the transfer
         if (cont != NULL && !cont()) {
+            i = i +1;
             break;
         }
     }

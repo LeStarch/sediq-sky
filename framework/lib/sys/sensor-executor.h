@@ -6,8 +6,8 @@
  */
 #include "string.h"
 
-#include "sensor.h"
-#include "executor.h"
+#include <sensor.h>
+#include <executor.h>
 
 #ifndef LIB_SYS_SENSOR_EXECUTOR_H_
 #define LIB_SYS_SENSOR_EXECUTOR_H_

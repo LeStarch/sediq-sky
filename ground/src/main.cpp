@@ -5,11 +5,12 @@
  *      Author: starchmd
  */
 #include <Arduino.h>
-
+#include "string.h"
 #include "logger.h"
 #include "radio.h"
 
 #define BUFFER_SIZE 1024
+#define POWER_LED 13
 
 Sediq::Radio radio;
 Sediq::Logger* LOG;
@@ -23,8 +24,9 @@ void loop()
 {
     size_t size = BUFFER_SIZE;
     uint8_t buffer[BUFFER_SIZE];
+    memset(buffer, 0, size);
     radio.recv(buffer, size);
-    LOG->log(Sediq::Logger::INFO, "%s", buffer);
+    LOG->log(Sediq::Logger::INFO, "(%d):%s", size, buffer);
 }
 /**
  * Setup the system, and turn on the radio
@@ -34,5 +36,5 @@ void setup() {
     delay(500);
     LOG->log(Sediq::Logger::DEBUG, "Beginning main program");
     radio.resume();
-    //TODO: Ground System ready LED?
+    digitalWrite(POWER_LED, HIGH);
 }

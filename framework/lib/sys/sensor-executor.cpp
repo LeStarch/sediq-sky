@@ -6,6 +6,7 @@
  */
 
 #include "sensor-executor.h"
+#include "logger.h"
 
 using namespace Sediq;
 SensorExecutor::SensorExecutor(const char* name, Sensor& sensor)
@@ -24,8 +25,9 @@ int SensorExecutor::execute(uint8_t* buffer, size_t& size)
     size_t num_packet = 0;
     size_t total = 0;
     size_t pack_size;
-
+    //Logger* LOGGER = Logger::getLogger(Logger::DEBUG);
     status = this->sensor->detect(num_packet);
+    //LOGGER->log(Logger::INFO, "Detected %d packets", num_packet);
     if (status != 0) {
         size = 0;
         return status;

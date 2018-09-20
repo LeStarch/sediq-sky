@@ -55,12 +55,12 @@
                 int mode;
                 /**
                  * Switch the mode of the radio to be transmit or receive
-                 * 1 - transmit
-                 * 0 - receive
+                 * 3 - transmit
+                 * 4 - receive
                  * \param mode: mode to switch to
                  * \return: 0 on success, or something else on error
                  */
-                int switchMode(int mode);
+                int switchMode(uint32_t mode);
                 /**
                  * Check to see if the fifo is ready for writing operations
                  * \return: 1 if ready, 0 if not ready

@@ -32,6 +32,7 @@ void Logger::log(Level level, const char* message, ...) {
     long lValue;
     int iValue;
     double dValue;
+    char* cpValue;
     //Ignore messages at lower levels
     if (this->level > level)
     {
@@ -73,6 +74,9 @@ void Logger::log(Level level, const char* message, ...) {
         } else if (proc && *prefix == 'l') {
             lValue = va_arg(args, long);
             Serial.print(lValue);
+        } else if (proc && *prefix == 's') {
+            cpValue = va_arg(args, char*);
+            Serial.print(cpValue);
         } else if (proc || *prefix != '%') {
             Serial.write(prefix, 1);
         }

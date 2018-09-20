@@ -79,6 +79,7 @@ int GPS::gpsMachine(uint32_t timeout)
     while ((this->serial->available() > 0) && (micros() < stop))
     {
         current = (unsigned char)this->serial->read();
+        Serial.println(current);
         //Life is a switch statement
         switch (this->state)
         {
